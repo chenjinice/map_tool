@@ -13,7 +13,7 @@ class WebView : public QWidget
     Q_OBJECT
 public:
     WebView(QString path,QWidget *parent = nullptr);
-
+    ~WebView();
 
 private:
     void                  loadFinish();

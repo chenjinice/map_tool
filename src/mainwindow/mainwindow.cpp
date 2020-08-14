@@ -1,11 +1,13 @@
 #include "mainwindow.h"
 #include "webview.h"
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
+
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
-    WebView *view = new WebView("https://www.baidu.com",this);
+    WebView *view = new WebView("c:/Users/63220/Desktop/web/index.html");
+    view->show();
 }
+
 
 MainWindow::~MainWindow()
 {
