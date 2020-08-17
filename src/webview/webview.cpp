@@ -19,6 +19,7 @@ WebView::WebView(QString path, QWidget *parent) : QWidget(parent)
     m_web->page()->setWebChannel(web_channel);
     m_web->load(QUrl(m_path));
     layout->addWidget(m_web);
+    layout->setMargin(0);
     this->setLayout(layout);
 
     connect(m_web,&QWebEngineView::loadFinished,this,&WebView::loadFinish);

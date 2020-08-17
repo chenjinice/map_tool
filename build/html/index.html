@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <!-- 图标 -->
+        <link rel="shortcut icon" type="image/x-icon" href="style/image/reverse.jpg" />
+        <title>map</title>
+
+        <link type="text/css" rel="stylesheet" href="style/css/stylesheet.css" />
+        <!-- leaflet -->
+        <link rel="stylesheet" href="js/leaflet/leaflet.css">
+        <link rel="stylesheet" href="js/leaflet/MarkerCluster.css">
+        <link rel="stylesheet" href="js/leaflet/MarkerCluster.Default.css">
+        <script src="js/leaflet/leaflet.js"></script>
+        <script src="js/leaflet/leaflet.markercluster-src.js"></script>
+        <script src="js/leaflet/leaflet.rotatedMarker.js"></script>
+
+        <!-- jquery -->
+        <link rel="stylesheet" href="style/js/jquery-ui-1.11.4/jquery-ui.css">
+        <script src="js/jquery-2.2.4/jquery.js"></script>
+        <script src="js/jquery-ui-1.11.4/jquery-ui.js"></script>
+        
+        <!-- webchannel -->
+        <script src="js/webchannel/qwebchannel.js"></script>
+    
+        <!-- 自己的js -->
+        <script src="js/common_map.js"></script>
+    </head>
+    
+    <body>
+	   	<div id="googleMap"></div>
+        <script>
+            $(document).ready(function(){
+                if (typeof qt != 'undefined'){
+                    new QWebChannel(qt.webChannelTransport, function(channel){
+                        //从通道中获取交互对象
+                        g_arg.obj = channel.objects.webobject;
+                        mapInit();
+                        add_marker(28.1195181,112.8520119);
+                    })
+                }else{
+                    mapInit();
+                    add_marker(28.1195181,112.8520119);
+                    add_marker(28.1114320,112.8657822);
+                }
+            })
+        </script>
+	</body>
+
+</html>
