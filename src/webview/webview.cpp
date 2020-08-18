@@ -1,6 +1,7 @@
 #include <QVBoxLayout>
 #include <QWebEngineView>
 #include <QWebChannel>
+#include <QFileInfo>
 #include <QDebug>
 #include "webview.h"
 #include "webobject.h"
@@ -8,11 +9,12 @@
 
 WebView::WebView(QString path, QWidget *parent) : QWidget(parent)
 {
+    QFileInfo info(path);
     QVBoxLayout *layout         = new QVBoxLayout;
 
     m_path                      = path;
     m_web                       = new QWebEngineView;
-    m_obj                       = new WebObject(this);
+    m_obj                       = new WebObject(info.path());
     QWebChannel *web_channel    = new QWebChannel(this);
     web_channel->registerObject("webobject",m_obj);
 
@@ -27,8 +29,8 @@ WebView::WebView(QString path, QWidget *parent) : QWidget(parent)
 
 WebView::~WebView()
 {
-//    delete m_obj;
-//    delete m_web;
+    delete m_obj;
+    delete m_web;
 }
 
 void WebView::loadFinish()
