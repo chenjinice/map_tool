@@ -9,6 +9,7 @@
 #include <QUrlQuery>
 #include <QProcess>
 #include <QDir>
+#include <QTimer>
 #include "webobject.h"
 
 
@@ -26,8 +27,6 @@ WebObject::WebObject(QString dir, QObject *parent) : QObject(parent)
 {
     m_map_dir           = dir + "/map/";
     m_ready             = true;
-    std::thread t1(&WebObject::connectGoogleThread,this);
-    t1.detach();
 
     m_thread            = new QThread;
     this->moveToThread(m_thread);
@@ -38,66 +37,85 @@ WebObject::WebObject(QString dir, QObject *parent) : QObject(parent)
 WebObject::~WebObject()
 {
     m_ready = false;
-    delete m_manager;
+    m_thread->quit();
+    m_thread->wait();
     delete m_request;
+    delete m_manager;
+    delete m_timer;
     delete m_thread;
+}
+
+bool WebObject::googleValid()
+{
+    return m_google;
 }
 
 void WebObject::threadFun()
 {
-    if(!m_manager)m_manager = new QNetworkAccessManager;
-    if(!m_request)m_request = new QNetworkRequest;
+    m_timer   = new QTimer;
+    m_manager = new QNetworkAccessManager;
+    m_request = new QNetworkRequest;
+    m_timer->setInterval(3000);
+    connect(m_timer,&QTimer::timeout,this,&WebObject::connectGoogleThread);
     connect(m_manager,&QNetworkAccessManager::finished,this,&WebObject::downloadFinish);
+    m_timer->start();
 
-    while (m_ready) {
+    uint count  = 0;
+    while(m_ready) {
         // while循环里边不用这个的话，不能接收QT的信号
         QApplication::processEvents();
         if(!m_google){
-            QThread::sleep(5);
+            QThread::sleep(2);
             continue;
         }
+        m_mutex.lock();
         if(m_list.length() == 0){
             QThread::sleep(1);
+            m_mutex.unlock();
             continue;
         }
-        if(m_img.status == 0){
-            m_img = m_list[0];
-            QString url_name = QString("http://mt1.google.com/vt/lyrs=s&x=%1&y=%2&z=%3").arg(m_img.x).arg(m_img.y).arg(m_img.z);
-            m_request->setUrl(QUrl(url_name));
-            m_manager->get(*m_request);
+        if(m_list.contains(m_url)){
+            if(count++ > 200){
+                m_list.removeAll(m_url);  // 下载超过一定时间，则发送新的下载请求
+                count = 0;
+            }
         }else{
-            if(m_img.status-- <= -200)this->listRemove(m_img);
+            count = 0;
+            m_url = m_list[0];
+            m_request->setUrl(QUrl(m_url));
+            m_manager->get(*m_request);
         }
+        m_mutex.unlock();
         QThread::usleep(20*1000);
     }
+    m_timer->stop();
 }
 
 void WebObject::connectGoogleThread()
 {
-    while (m_ready) {
-        QProcess process;
-        process.start("ping -n 2 www.google.com");
-        process.waitForStarted();
-        if( !process.waitForFinished(3000) ){
-            process.kill();
-            process.waitForFinished(300);
-        }
-        QString str = process.readAll();
-        if(str.indexOf("TTL") == -1){
-            qDebug() << "connect to google failed !!!";
-            m_google = false;
-        }else{
-            qDebug() << "connect to google success !!!";
-            m_google = true;
-        }
-        QThread::sleep(3);
+    QProcess process;
+    process.start("ping -n 2 www.google.com");
+    process.waitForStarted();
+    if( !process.waitForFinished(2000) ){
+        process.kill();
+        process.waitForFinished(300);
     }
+    QString str = process.readAll();
+    QString log;
+    if(str.indexOf("TTL") == -1){
+        log = "connect to google failed !!";
+        m_google = false;
+    }else{
+        log = "connect to google success";
+        m_google = true;
+    }
+    qDebug() << log;
+    emit logToUi(log);
 }
-
 
 QString WebObject::getLocalImgPath(int x, int y, int z, MapType type)
 {
-    QString str  = m_map_dir;
+    QString str = "others/";
     QString path;
     switch (type) {
         case LOCAL_G_SATELLITE:
@@ -108,8 +126,10 @@ QString WebObject::getLocalImgPath(int x, int y, int z, MapType type)
         case REMOTE_G_STREET:
             path = STREET_MAP_DIR;
             break;
+        default:
+            break;
     }
-    str += path + QString("%1/%2/%3.jpg").arg(z).arg(x).arg(y);
+    str = m_map_dir + path + QString("%1/%2/%3.jpg").arg(z).arg(x).arg(y);
     return str;
 }
 
@@ -126,59 +146,27 @@ QString WebObject::getRemoteImgPath(int x, int y, int z, MapType type)
         case REMOTE_G_STREET:
             url = STREET_MAP_URL;
             break;
+        default:
+            break;
     }
     str = url + QString("&x=%1&y=%2&z=%3").arg(x).arg(y).arg(z);
     return str;
 }
 
-
-void WebObject::listRemove(ImgInfo &m)
-{
-    m_mutex.lock();
-    int len = m_list.length(),i;
-    for(i=len-1;i>=0;i--){
-        ImgInfo *p = &m_list[i];
-        if( (p->x==m.x) &&(p->y==m.y)&&(p->z==m.z))m_list.removeAt(i);
-    }
-    m_img.status = 0;
-    m_mutex.unlock();
-}
-
-bool WebObject::listFind(ImgInfo &m)
-{
-    bool ret = false;
-    int len = m_list.length(),i;
-    for(i=0;i<len;i++){
-        ImgInfo *p = &m_list[i];
-        if( (p->x==m.x) &&(p->y==m.y)&&(p->z==m.z)){
-            ret = true;
-            break;
-        }
-    }
-    return ret;
-}
-
 void WebObject::listAdd(Range &x, Range &y, int z, MapType type)
 {
-    int max = 100;
+    int max = 1000;
     if(!m_google)return;
     m_mutex.lock();
     for(int i=x.min;i<=x.max;i++){
         for(int j=y.min;j<=y.max;j++){
-            QString file_name = getLocalImgPath(i,j,z,type);
+            QString file_name = this->getLocalImgPath(i,j,z,type);
             QFile file(file_name);
             if(file.exists())continue;
 
-            ImgInfo m;
-            m.x = i;
-            m.y = j;
-            m.z = z;
-            m.status = -1;
-            m.url = this->getRemoteImgPath(i,j,z,type);
-
-            if(this->listFind(m))continue;
-            m_list.prepend(m);
-
+            QString url       = this->getRemoteImgPath(i,j,z,type);
+            if(m_list.contains(url))continue;
+            m_list.prepend(url);
             if(m_list.length() > max)m_list.pop_back();
         }
     }
@@ -238,20 +226,25 @@ void WebObject::downloadFinish(QNetworkReply *reply)
 {
     QString url = reply->url().toString();
     QUrlQuery query(url);
-    ImgInfo m;
-    QString lyrs = "others";
-    m.x = query.queryItemValue("x").toInt();
-    m.y = query.queryItemValue("y").toInt();
-    m.z = query.queryItemValue("z").toInt();
-    if(url.indexOf("lyrs=s") != -1)lyrs = "s";
-    if(url.indexOf("lyrs=m") != -1)lyrs = "m";
-    this->listRemove(m);
+
+    m_mutex.lock();
+    m_list.removeAll(url);
+    m_mutex.unlock();
+
+    MapType type = OTHERS;
+    int x = query.queryItemValue("x").toInt();
+    int y = query.queryItemValue("y").toInt();
+    int z = query.queryItemValue("z").toInt();
+    if(url.indexOf("lyrs=s") != -1)type = REMOTE_G_SATELLITE;
+    if(url.indexOf("lyrs=m") != -1)type = REMOTE_G_STREET;
+
+    QString log;
     if (reply->error() == QNetworkReply::NoError){
-        qDebug() << "download ok :" << url;
+        log = "download ok : " + url;
         QByteArray bytes = reply->readAll();
-        QString pre = m_map_dir+lyrs;
-        QString file_path = pre + QString("/%1/%2/").arg(m.z).arg(m.x);
-        QString file_name = pre + QString("/%1/%2/%3.jpg").arg(m.z).arg(m.x).arg(m.y);
+        QString file_name = getLocalImgPath(x,y,z,type);
+        QFileInfo info(file_name);
+        QString file_path = info.path();
         QDir dir;
         dir.mkpath(file_path);
         QFile file(file_name);
@@ -260,8 +253,10 @@ void WebObject::downloadFinish(QNetworkReply *reply)
         file.close();
         this->sendUpdateSignal();
     }else{
-        qDebug() << "download fail :" << url << " , " << reply->error();
+        log = "download fail : " + url + reply->error();
     }
+    qDebug() << log;
+    emit logToUi(log);
 }
 
 void WebObject::sendUpdateSignal()

@@ -35,6 +35,6 @@ WebView::~WebView()
 
 void WebView::loadFinish()
 {
-    qDebug() << "aaaaa";
+
 }
 

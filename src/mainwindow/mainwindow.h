@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 
+class QMdiArea;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -10,5 +12,17 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
+
+private:
+    void                setMenu();
+    void                newNormalTrigged();
+    void                newLdmTrigged();
+    void                logActionTrigged();
+
+    QMdiArea *          m_mdi       = nullptr;
 };
+
 #endif // MAINWINDOW_H
+
+

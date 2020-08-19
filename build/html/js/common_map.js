@@ -3,8 +3,8 @@
 // 地图类型
 var mapType = {
     localGoogleSatellite  : 0,
-    localGoogleStreet     : 1,
-    remoteGoogleSatellite : 2,
+    remoteGoogleSatellite : 1,
+    localGoogleStreet     : 2,
     remoteGoogleStreet    : 3
 }
 
@@ -18,32 +18,33 @@ var g_arg = {
     center  : [28.1128547,112.8668242],
     zoom    : 17,
     minZoom : 3,
-    maxZoom : 24,
+    maxZoom : 22,
     group   : null
 }
 
 
 // 初始化地图
 function mapInit(){
-    var url = "map/{z}/{x}/{y}.jpg";
+    var url = "map/s/{z}/{x}/{y}.jpg";
+//    g_arg.type = mapType.remoteGoogleStreet;
     if(g_arg.type == mapType.localGoogleSatellite){
-        url = "map/{z}/{x}/{y}.jpg";
+        url = "map/s/{z}/{x}/{y}.jpg";
     }else if(g_arg.type == mapType.localGoogleStreet){
-        
+        url = "map/m/{z}/{x}/{y}.jpg";
     }else if(g_arg.type == mapType.remoteGoogleSatellite){
         url = "http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}";
     }else if(g_arg.type == mapType.remoteGoogleStreet){
-        
+        url = "http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}";
     }
     
     if(g_arg.map == null){
         g_arg.map = L.map('googleMap',{zoomAnimation:true});
         g_arg.map.setView(g_arg.center,g_arg.zoom);
-        g_arg.map.on("moveend",function(event){
+        g_arg.map.on("move",function(event){
             var b = g_arg.map.getBounds();
             var zoom = g_arg.map.getZoom();
             if(g_arg.obj != null){
-                g_arg.obj.getBounds(b.getSouth(),b.getNorth(),b.getWest(),b.getEast(),zoom);
+                g_arg.obj.getBounds(b.getSouth(),b.getNorth(),b.getWest(),b.getEast(),zoom,g_arg.type);
             }
         })
     }

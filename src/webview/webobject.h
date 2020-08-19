@@ -1,33 +1,26 @@
 #ifndef WEBOBJECT_H
 #define WEBOBJECT_H
 
-
 #include <QObject>
 #include <QMutex>
 #include <thread>
 #include <QThread>
+#include <QStringList>
+
 
 class QNetworkAccessManager;
 class QNetworkRequest;
 class QNetworkReply;
+class QTimer;
+
 
 // 瓦片类型
 enum MapType{
     LOCAL_G_SATELLITE    = 0,
     REMOTE_G_SATELLITE   = 1,
     LOCAL_G_STREET       = 2,
-    REMOTE_G_STREET      = 3
-};
-
-// 瓦片信息
-class ImgInfo
-{
-public:
-    int x                = 0;
-    int y                = 0;
-    int z                = 0;
-    int status           = 0;
-    QString url;
+    REMOTE_G_STREET      = 3,
+    OTHERS
 };
 
 // 地图的瓦片范围
@@ -45,6 +38,7 @@ class WebObject : public QObject
 public:
     WebObject(QString dir, QObject *parent = nullptr);
     ~WebObject();
+    bool                    googleValid();
 
 
 private:
@@ -52,8 +46,6 @@ private:
     void                    connectGoogleThread();
     QString                 getLocalImgPath(int x,int y,int z,MapType type);
     QString                 getRemoteImgPath(int x,int y, int z, MapType type);
-    void                    listRemove(ImgInfo &m);
-    bool                    listFind(ImgInfo &m);
     void                    listAdd(Range &x, Range &y, int z,MapType type);
     double                  moduleOperation(double num, int min, int max);
     void                    getX(double lng1, double lng2, int z, Range &r);
@@ -63,15 +55,17 @@ private:
 
     bool                    m_google        = false;
     bool                    m_ready         = false;
+    QString                 m_url;
     QString                 m_map_dir;
-    ImgInfo                 m_img;
-    QList<ImgInfo>          m_list;
+    QStringList             m_list;
     QThread *               m_thread        = nullptr;
     QMutex                  m_mutex;
     QNetworkRequest *       m_request       = nullptr;
     QNetworkAccessManager * m_manager       = nullptr;
+    QTimer *                m_timer         = nullptr;
 
 signals:
+    void                    logToUi(QString str);
     void                    mapUpdate();
 
 public slots:

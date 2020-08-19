@@ -7,7 +7,7 @@ var g_street = null;
 var g_center = [28.1128547,112.8668242];
 var g_zoom = 17;
 var g_minZoom = 3;
-var g_maxZoom = 24;
+var g_maxZoom = 22;
 
 var g_lng;
 var g_lat;

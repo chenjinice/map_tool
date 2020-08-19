@@ -36,7 +36,10 @@
                         //从通道中获取交互对象
                         g_arg.obj = channel.objects.webobject;
                         mapInit();
-                        add_marker(28.1195181,112.8520119);
+                        g_arg.obj.mapUpdate.connect(function (text) {
+                            mapInit();
+                        });
+                        add_marker(28.1339123,112.9040909);
                     })
                 }else{
                     mapInit();

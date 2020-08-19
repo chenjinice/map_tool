@@ -18,14 +18,21 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
+    logwidget/logdock.cpp \
     main.cpp \
     mainwindow/mainwindow.cpp \
+    subwindow/ldmwindow.cpp \
+    subwindow/normalwindow.cpp \
     webview/webobject.cpp \
     webview/webview.cpp
 
 
 HEADERS += \
+    common/common_defines.h \
+    logwidget/logdock.h \
     mainwindow/mainwindow.h \
+    subwindow/ldmwindow.h \
+    subwindow/normalwindow.h \
     webview/webobject.h \
     webview/webview.h
 

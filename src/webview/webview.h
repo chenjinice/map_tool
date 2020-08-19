@@ -18,8 +18,8 @@ public:
 private:
     void                  loadFinish();
 
-    QWebEngineView *      m_web;
-    WebObject *           m_obj;
+    QWebEngineView *      m_web         = nullptr;
+    WebObject *           m_obj         = nullptr;
     QString               m_path;
 
 
