@@ -2,7 +2,7 @@
 #include <QDebug>
 #include "ldmwindow.h"
 #include "webview.h"
-#include "common/common_defines.h"
+#include "common_defines.h"
 
 
 LdmWindow::LdmWindow(QWidget *parent) : QWidget(parent)

@@ -65,7 +65,7 @@ void WebObject::threadFun()
         // while循环里边不用这个的话，不能接收QT的信号
         QApplication::processEvents();
         if(!m_google){
-            QThread::sleep(2);
+            QThread::sleep(1);
             continue;
         }
         m_mutex.lock();

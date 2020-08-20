@@ -67,6 +67,10 @@ private:
 signals:
     void                    logToUi(QString str);
     void                    mapUpdate();
+    void                    addMarker();
+    void                    addMarkerAt(double lng,double lat);
+    void                    openMapJson(QString file);
+    void                    openPathJson(QString file);
 
 public slots:
     void                    getBounds(double lat1, double lat2, double lng1, double lng2,int zoom,int type);

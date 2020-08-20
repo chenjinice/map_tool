@@ -2,10 +2,9 @@
 #define WEBVIEW_H
 
 #include <QWidget>
-
+#include "webobject.h"
 
 class QWebEngineView;
-class WebObject;
 
 
 class WebView : public QWidget
@@ -14,6 +13,8 @@ class WebView : public QWidget
 public:
     WebView(QString path,QWidget *parent = nullptr);
     ~WebView();
+
+    WebObject *           obj();
 
 private:
     void                  loadFinish();

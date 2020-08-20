@@ -10,9 +10,9 @@
 #include <QApplication>
 #include "mainwindow.h"
 #include "webview.h"
-#include "logwidget/logdock.h"
-#include "subwindow/ldmwindow.h"
-#include "subwindow/normalwindow.h"
+#include "logdock.h"
+#include "ldmwindow.h"
+#include "normalwindow.h"
 
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
@@ -41,13 +41,6 @@ void MainWindow::setMenu()
     w_menu->addSeparator();
     w_menu->addAction(log_a);
     menu->addMenu(w_menu);
-
-//    QMenu *   o_menu        = new QMenu("操作");
-//    QAction * add_a         = new QAction("中心加点",this);
-//    QAction * add_at_a      = new QAction("加点",this);
-//    o_menu->addAction(add_a);
-//    o_menu->addAction(add_at_a);
-//    menu->addMenu(o_menu);
 
     QMenu *  about_menu     = new QMenu("关于");
     QAction * aboutme_a     = new QAction("Me",this);
@@ -89,6 +82,7 @@ void MainWindow::logActionTrigged()
 
 MainWindow::~MainWindow()
 {
+    qDebug() << "~~~~~~~~~~~~~mainwindow";
     m_mdi->closeAllSubWindows();
     delete m_mdi;
 }

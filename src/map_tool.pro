@@ -1,5 +1,5 @@
 
-QT       += core gui webenginewidgets webchannel
+QT       += core gui webenginewidgets webchannel network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -18,30 +18,41 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
+    common/setting.cpp \
     logwidget/logdock.cpp \
     main.cpp \
     mainwindow/mainwindow.cpp \
     subwindow/ldmwindow.cpp \
     subwindow/normalwindow.cpp \
+    subwindow/udpthread.cpp \
     webview/webobject.cpp \
     webview/webview.cpp
 
 
 HEADERS += \
     common/common_defines.h \
+    common/setting.h \
     logwidget/logdock.h \
     mainwindow/mainwindow.h \
     subwindow/ldmwindow.h \
     subwindow/normalwindow.h \
+    subwindow/udpthread.h \
     webview/webobject.h \
     webview/webview.h
 
 
 INCLUDEPATH += mainwindow/
 INCLUDEPATH += webview/
+INCLUDEPATH += subwindow/
+INCLUDEPATH += common/
+INCLUDEPATH += logwidget/
 
+LIBS += -lws2_32
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    img.qrc

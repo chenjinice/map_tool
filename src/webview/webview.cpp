@@ -4,7 +4,6 @@
 #include <QFileInfo>
 #include <QDebug>
 #include "webview.h"
-#include "webobject.h"
 
 
 WebView::WebView(QString path, QWidget *parent) : QWidget(parent)
@@ -31,6 +30,11 @@ WebView::~WebView()
 {
     delete m_obj;
     delete m_web;
+}
+
+WebObject *WebView::obj()
+{
+    return m_obj;
 }
 
 void WebView::loadFinish()
