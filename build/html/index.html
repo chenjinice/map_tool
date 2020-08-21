@@ -31,20 +31,33 @@
 	   	<div id="googleMap"></div>
         <script>
             $(document).ready(function(){
-                if (typeof qt != 'undefined'){
+                if(typeof qt != 'undefined'){
                     new QWebChannel(qt.webChannelTransport, function(channel){
-                        //从通道中获取交互对象
+                        // 从通道中获取交互对象
                         g_arg.obj = channel.objects.webobject;
                         mapInit();
-                        g_arg.obj.mapUpdate.connect(function (text) {
+                        g_arg.obj.mapUpdate.connect(function(){
                             mapInit();
                         });
-                        add_marker(28.1339123,112.9040909);
+                        g_arg.obj.carUpdate.connect(function(file){
+                        });
+                        g_arg.obj.addMarker.connect(function(){
+                            addMarkerAtCenter();
+                        });
+                        g_arg.obj.addMarkerAt.connect(function(lng,lat){
+                            addMarker(lng,lat);
+                        });
+                        g_arg.obj.openMapJson.connect(function(file){
+                            mapParse(file);
+                        });
+                        g_arg.obj.openPathJson.connect(function(file){
+                        });
+                        addMarker(112.9040909,28.1339123);
                     })
                 }else{
                     mapInit();
-                    add_marker(28.1195181,112.8520119);
-                    add_marker(28.1114320,112.8657822);
+                    addMarker(112.8520119,28.1195181);
+                    addMarker(112.8657822,28.1114320);
                 }
             })
         </script>

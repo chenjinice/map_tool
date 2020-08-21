@@ -60,13 +60,14 @@ private:
     QStringList             m_list;
     QThread *               m_thread        = nullptr;
     QMutex                  m_mutex;
-    QNetworkRequest *       m_request       = nullptr;
-    QNetworkAccessManager * m_manager       = nullptr;
-    QTimer *                m_timer         = nullptr;
+    QNetworkRequest *       request       = nullptr;
+    QNetworkAccessManager * manager       = nullptr;
+    QTimer *                timer         = nullptr;
 
 signals:
     void                    logToUi(QString str);
     void                    mapUpdate();
+    void                    carUpdate(double lng,double lat,float heading);
     void                    addMarker();
     void                    addMarkerAt(double lng,double lat);
     void                    openMapJson(QString file);

@@ -12,6 +12,7 @@
 #include <QDialog>
 #include <QApplication>
 #include <QLineEdit>
+#include <QFileDialog>
 #include <QDesktopWidget>
 #include "normalwindow.h"
 #include "webview.h"
@@ -52,11 +53,12 @@ NormalWindow::~NormalWindow()
     delete m_udp_thread;
     delete m_webview;
     this->logEnd();
-    qDebug() << "~~~~~~~~~~~~ normal window";
 }
 
 void NormalWindow::addCarInfoWidget()
 {
+    m_grid->setHorizontalSpacing(0);
+    Qt::Alignment align = Qt::AlignLeft | Qt::AlignVCenter;
     // 左边栏的车数据相关控件
     QLabel *     udp_l       = new QLabel("udp : ");
     m_state                  = new QLabel;
@@ -65,7 +67,7 @@ void NormalWindow::addCarInfoWidget()
     QLabel *     heading_l   = new QLabel("航向 : ");
     QLabel *     speed_l     = new QLabel("速度 : ");
     QLabel *     satellite_l = new QLabel("卫星 : ");
-    QLabel *     gpod_l      = new QLabel("精度因子 : ");
+    QLabel *     gpod_l      = new QLabel("精度 : ");
     m_lng                    = new QLabel;
     m_lat                    = new QLabel;
     m_heading                = new QLabel;
@@ -77,36 +79,41 @@ void NormalWindow::addCarInfoWidget()
     m_state->setFixedSize(15,15);
     m_state->setScaledContents(true);
 
-    m_grid->addWidget(udp_l,m_index,0);
-    m_grid->addWidget(m_combo,m_index,1);
+    m_grid->addWidget(udp_l,m_index,0,align);
+    m_grid->addWidget(m_combo,m_index,1,align);
     m_grid->addWidget(m_state,m_index++,2);
-    m_grid->addWidget(lng_l,m_index,0);
-    m_grid->addWidget(m_lng,m_index++,1);
-    m_grid->addWidget(lat_l,m_index,0);
-    m_grid->addWidget(m_lat,m_index++,1);
-    m_grid->addWidget(heading_l,m_index,0);
-    m_grid->addWidget(m_heading,m_index++,1);
-    m_grid->addWidget(speed_l,m_index,0);
-    m_grid->addWidget(m_speed,m_index++,1);
-    m_grid->addWidget(satellite_l,m_index,0);
-    m_grid->addWidget(m_satellite,m_index++,1);
-    m_grid->addWidget(gpod_l,m_index,0);
-    m_grid->addWidget(m_gpod,m_index++,1);
+    m_grid->addWidget(lng_l,m_index,0,align);
+    m_grid->addWidget(m_lng,m_index++,1,align);
+    m_grid->addWidget(lat_l,m_index,0,align);
+    m_grid->addWidget(m_lat,m_index++,1,align);
+    m_grid->addWidget(heading_l,m_index,0,align);
+    m_grid->addWidget(m_heading,m_index++,1,align);
+    m_grid->addWidget(speed_l,m_index,0,align);
+    m_grid->addWidget(m_speed,m_index++,1,align);
+    m_grid->addWidget(satellite_l,m_index,0,align);
+    m_grid->addWidget(m_satellite,m_index++,1,align);
+    m_grid->addWidget(gpod_l,m_index,0,align);
+    m_grid->addWidget(m_gpod,m_index++,1,align);
     m_car_widget->setLayout(m_grid);
 }
 
 void NormalWindow::addButtons()
 {
+    QLabel *save_l           = new QLabel("存点 : ");
+    m_line_edit              = new QLineEdit;
     QPushButton *add_bt      = new QPushButton("中心加点");
     QPushButton *add_at_bt   = new QPushButton("加点");
     QPushButton *map_bt      = new QPushButton("国标地图json");
     QPushButton *path_bt     = new QPushButton("采点路径json");
 
+    m_grid->addWidget(save_l,m_index,0);
+    m_grid->addWidget(m_line_edit,m_index++,1);
     m_grid->addWidget(add_bt,m_index++,0,1,2);
     m_grid->addWidget(add_at_bt,m_index++,0,1,2);
     m_grid->addWidget(map_bt,m_index++,0,1,2);
     m_grid->addWidget(path_bt,m_index++,0,1,2);
 
+    connect(m_line_edit,&QLineEdit::returnPressed,this,&NormalWindow::saveClicked);
     connect(add_bt,&QPushButton::clicked,this,&NormalWindow::addClicked);
     connect(add_at_bt,&QPushButton::clicked,this,&NormalWindow::addAtClicked);
     connect(map_bt,&QPushButton::clicked,this,&NormalWindow::openMapClicked);
@@ -153,6 +160,7 @@ void NormalWindow::udpState(bool flag)
 
 void NormalWindow::dataSlot(UiData data)
 {
+    m_data            = data;
     QString lng       = QString::number(data.lng,10,7);
     QString lat       = QString::number(data.lat,10,7);
     QString heading   = QString::number(data.heading,10,2);
@@ -165,6 +173,7 @@ void NormalWindow::dataSlot(UiData data)
     m_speed->setText(speed + " km/h");
     m_satellite->setText(sate);
     m_gpod->setText(accuracy);
+    emit m_webview->obj()->carUpdate(data.lng,data.lat,data.heading);
 
     QString dirct = C_LOG_PATH;
     QDir dir;
@@ -209,6 +218,33 @@ void NormalWindow::logEnd()
     file.write(tmp.toUtf8());
 }
 
+void NormalWindow::saveClicked()
+{
+    UiData data = m_data;
+    QString lng       = QString::number(data.lng,10,7);
+    QString lat       = QString::number(data.lat,10,7);
+    QString heading   = QString::number(data.heading,10,2);
+    QString sate      = QString::number(data.satellite);
+    QString accuracy  = QString::number(data.accuracy,10,2);
+
+    QString dirct = C_LOG_PATH;
+    QDir dir;
+    if(!dir.exists(dirct))dir.mkpath(dirct);
+    QString file_name = dirct + "/points.txt";
+    QFile file(file_name);
+    bool ret = file.open(QIODevice::Append);
+    if(!ret)return;
+
+    QString log = QDateTime::currentDateTime().toString("[yyyy.MM.dd_hh:mm:ss] ");
+    log += lng + ","  ;
+    log += lat + ","  ;
+    log += heading + ",";
+    log += sate + ",";
+    log += accuracy + " ---- " + m_line_edit->text() + QString(C_LINE_END);
+    file.write(log.toUtf8());
+    file.close();
+}
+
 void NormalWindow::addClicked()
 {
     emit m_webview->obj()->addMarker();
@@ -216,25 +252,26 @@ void NormalWindow::addClicked()
 
 void NormalWindow::addAtClicked()
 {
-    static QDialog *dialog = nullptr;
+    static QDialog *   dialog  = nullptr;
     static QLineEdit *lat_edit = new QLineEdit;
     static QLineEdit *lng_edit = new QLineEdit;
     static QDesktopWidget *deskdop = QApplication::desktop();
 
-    double lat ,lng;
     if(dialog == nullptr){
         dialog = new QDialog;
         QGridLayout *layout = new QGridLayout;
         QLabel *lat_label = new QLabel("纬度");
         QLabel *lng_label = new QLabel("经度");
+        QLabel *ex_label  = new QLabel("例如 : 112.1234567 , 22.7654321");
         QPushButton *ok_button = new QPushButton("确定");
         QPushButton *cancel_button = new QPushButton("取消");
-        layout->addWidget(lat_label,0,0,1,1);
-        layout->addWidget(lat_edit,0,1,1,1);
+        layout->addWidget(ex_label,0,0,1,2);
         layout->addWidget(lng_label,1,0,1,1);
         layout->addWidget(lng_edit,1,1,1,1);
-        layout->addWidget(ok_button,2,0,1,1);
-        layout->addWidget(cancel_button,2,1,1,1);
+        layout->addWidget(lat_label,2,0,1,1);
+        layout->addWidget(lat_edit,2,1,1,1);
+        layout->addWidget(ok_button,3,0,1,1);
+        layout->addWidget(cancel_button,3,1,1,1);
         dialog->setLayout(layout);
         dialog->setWindowTitle("经纬度点");
         dialog->move((deskdop->width()-dialog->width())/2,(deskdop->height()-dialog->height())/2);
@@ -244,19 +281,25 @@ void NormalWindow::addAtClicked()
     }
     int ret = dialog->exec();
     if(ret == QDialog::Accepted){
-        lat = lat_edit->text().toDouble();
-        lng = lng_edit->text().toDouble();
+        double lng = lng_edit->text().toDouble();
+        double lat = lat_edit->text().toDouble();
         emit m_webview->obj()->addMarkerAt(lng,lat);
     }
 }
 
 void NormalWindow::openMapClicked()
 {
-
+    QStringList l = QFileDialog::getOpenFileNames(this,"打开地图文件");
+    for(int i=0; i<l.length();i++){
+        emit m_webview->obj()->openMapJson(l[i]);
+    }
 }
 
 void NormalWindow::openPathClicked()
 {
-
+    QStringList l = QFileDialog::getOpenFileNames(this,"打开采点文件");
+    for(int i=0; i<l.length();i++){
+        emit m_webview->obj()->openPathJson(l[i]);
+    }
 }
 

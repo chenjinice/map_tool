@@ -39,9 +39,6 @@ WebObject::~WebObject()
     m_ready = false;
     m_thread->quit();
     m_thread->wait();
-    delete m_request;
-    delete m_manager;
-    delete m_timer;
     delete m_thread;
 }
 
@@ -52,13 +49,13 @@ bool WebObject::googleValid()
 
 void WebObject::threadFun()
 {
-    m_timer   = new QTimer;
-    m_manager = new QNetworkAccessManager;
-    m_request = new QNetworkRequest;
-    m_timer->setInterval(3000);
-    connect(m_timer,&QTimer::timeout,this,&WebObject::connectGoogleThread);
-    connect(m_manager,&QNetworkAccessManager::finished,this,&WebObject::downloadFinish);
-    m_timer->start();
+    QTimer *                timer   = new QTimer;
+    QNetworkAccessManager * manager = new QNetworkAccessManager;
+    QNetworkRequest *       request = new QNetworkRequest;
+    timer->setInterval(3000);
+    connect(timer,&QTimer::timeout,this,&WebObject::connectGoogleThread);
+    connect(manager,&QNetworkAccessManager::finished,this,&WebObject::downloadFinish);
+    timer->start();
 
     uint count  = 0;
     while(m_ready) {
@@ -82,13 +79,16 @@ void WebObject::threadFun()
         }else{
             count = 0;
             m_url = m_list[0];
-            m_request->setUrl(QUrl(m_url));
-            m_manager->get(*m_request);
+            request->setUrl(QUrl(m_url));
+            manager->get(*request);
         }
         m_mutex.unlock();
         QThread::usleep(20*1000);
     }
-    m_timer->stop();
+    timer->stop();
+    delete timer;
+    delete request;
+    delete manager;
 }
 
 void WebObject::connectGoogleThread()
