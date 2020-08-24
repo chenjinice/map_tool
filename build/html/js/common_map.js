@@ -1,5 +1,4 @@
 
-
 // 地图类型
 var mapType = {
     localGoogleSatellite  : 0,
@@ -7,7 +6,6 @@ var mapType = {
     localGoogleStreet     : 2,
     remoteGoogleStreet    : 3
 }
-
 
 // 全局变量
 var g_arg = {
@@ -18,12 +16,22 @@ var g_arg = {
     center  : [28.1128547,112.8668242],
     zoom    : 17,
     minZoom : 3,
-    maxZoom : 22,
+    maxZoom : 24,
+    allLayer: [],
     group   : null
 }
 
 var g_lng;
 var g_lat;
+var g_car   = null;
+
+var g_arrow_icon  = L.icon({ iconUrl:'style/image/arrow.png',iconSize: [15, 15]});
+var g_arrow2_icon = L.icon({ iconUrl:'style/image/arrow2.png',iconSize: [15, 15]});
+var g_car_icon    = L.icon({ iconUrl:'style/image/car.png',iconSize: [25, 48],iconAnchor:[12.5,48] });
+
+var g_color       = ["#FF0000","#00FF00","#FFFF00"];
+var g_color_index = 0;
+
 
 // 初始化地图
 function mapInit(){
@@ -80,59 +88,75 @@ function addMarker(lng,lat){
         marker.setPopupContent("lng : "+lng_new+"</br>lat : "+lat_new);
 	});
     g_arg.map.panTo([lat,lng],{"animate":true,"duration":1});
+    saveLayer(marker);
 }
 
+// 更新车的位置
+function updateCar(lng,lat,heading){
+    if(g_car == null){
+        g_car = L.marker([lat,lng],{icon:g_car_icon,rotationAngle:heading}).addTo(g_arg.map);
+    }else{
+        g_car.setLatLng([lat,lng]);
+        g_car.setRotationAngle(heading);
+    }
+}
 
+// layout 存到全局变量
+function saveLayer(single_layer){
+    g_arg.allLayer.push(single_layer);
+}
+
+// 清除所有
+function clearAll(){
+    for(var i in g_arg.allLayer){
+        g_arg.map.removeLayer(g_arg.allLayer[i])
+    }
+    g_arg.group.clearLayers();
+    
+}
 
 // -----------------------------------map json 解析--------------------------------------------------
 
 // 添加车道的折线
-function addLaneLine(latlngs,id){
+function addLaneLine(latlngs,id,line_color){
     var len = latlngs.length ,i,angle = 0;
-    var line_color = "#FF0000";
     if(len == 0 )return;
     for(i=0;i<len;i++){
         if(i<len-1)angle = Math.atan2(latlngs[i+1][1]-latlngs[i][1],latlngs[i+1][0]-latlngs[i][0])*180/Math.PI;
         addNodePoint(latlngs[i],angle);
     }
     if(len>1){
-        var polyline = L.polyline(latlngs, {color:line_color,weight:5}).addTo(g_map);
+        var polyline = L.polyline(latlngs, {color:line_color,weight:5}).addTo(g_arg.map);
         polyline.bindPopup("laneID="+id);
-        polyline.source = "map";
-        polyline.id = g_index++;
-        g_layers.push(polyline);
+        saveLayer(polyline);
     }
+    
 }
 
 
 // 添加车道上点的图标
 function addNodePoint(latlng,angle)
 {
-    var marker = L.marker([latlng[0],latlng[1]],{icon:g_arrow_icon,rotationAngle:angle,rotationOrigin:'center',}).addTo(g_map);
-    marker.source = "map";
+    var marker = L.marker([latlng[0],latlng[1]],{icon:g_arrow_icon,rotationAngle:angle,rotationOrigin:'center',}).addTo(g_arg.map);
     var lat_offset = latlng[0]*1e7 - g_lat;
     var lng_offset = latlng[1]*1e7 - g_lng;
     var tmp_angle = angle;
     if(tmp_angle <0)tmp_angle += 360.0;
     tmp_angle = tmp_angle.toFixed(2);
     marker.bindPopup("lng : "+latlng[1]+"</br>lat : "+latlng[0] +"</br>lng_offset : "+lng_offset+"</br>lat_offset : "+lat_offset +"</br>angle :"+tmp_angle);
-//    marker.bindPopup("lng : "+latlng[1]+"</br>lat : "+latlng[0]);
-    marker.id = g_index++;
-    g_layers.push(marker);
+    saveLayer(marker);
 }
 
 
 // 添加node中心点图标
 function addCenterPoint(lat,lng,n_id,n_region){
-    var marker = L.marker([lat,lng]).addTo(g_map);
+    var marker = L.marker([lat,lng]).addTo(g_arg.map);
     marker.bindPopup("id : "+n_id+"</br>region : "+n_region+"</br>lng : "+lng+"</br>lat : "+lat);
-    marker.source = "map";
-    marker.id = g_index++;
-    g_layers.push(marker);
+    saveLayer(marker);
 }
 
 // 解析node中的links
-function json_links_parse(links)
+function linksParse(links)
 {
     for(var i in links) {
         var lanes = links[i].lanes;
@@ -145,7 +169,7 @@ function json_links_parse(links)
                 var plat = (p.lat*1e-7).toFixed(7);
                 latlngs.push([plat,plng]);
             }
-            addLaneLine(latlngs,lanes[j].laneID);
+            addLaneLine(latlngs,lanes[j].laneID,"#FF0000");
         }
     }
 }
@@ -166,8 +190,8 @@ function addMapJson(data)
         var inlinks = node.links;
         var center = [lat,lng];
         addCenterPoint(lat,lng,node_id,node_region);
-        g_map.panTo(center,{animate:true,duration:0.5});
-        json_links_parse(inlinks);
+        g_arg.map.panTo(center,{animate:true,duration:0.5});
+        linksParse(inlinks);
     }
 }
 
@@ -179,7 +203,7 @@ function addRsiJson(data)
     var lng = (g_lng*1e-7).toFixed(7);
     var lat = (g_lat*1e-7).toFixed(7);
     var center = [lat,lng];
-    g_map.panTo(center,{animate:true,duration:0.5});
+    g_arg.map.panTo(center,{animate:true,duration:0.5});
     addCenterPoint(lat,lng,"--","--");
     var latlngs = [];
     for(var k in data.alertPath){
@@ -188,7 +212,7 @@ function addRsiJson(data)
         var plat = (p.lat*1e-7).toFixed(7);
         latlngs.push([plat,plng]);
     }
-    addLaneLine(latlngs,"--");
+    addLaneLine(latlngs,"--","#FF0000");
 }
 
 // 解析json文件
@@ -200,5 +224,57 @@ function mapParse(filename){
         if(type == "rsi")addRsiJson(data);
 	}).error(function() {alert("解析json失败 , "+filename);});
 }
+
+
+
+
+
+// --------------------------采点保存的json相关--------------------
+
+// 画线
+function addPathLine(latlngs,line_color){
+	var len = latlngs.length;
+    if(len > 1){
+        var polyline = L.polyline(latlngs, {color:line_color,weight:2}).addTo(g_arg.map);
+        saveLayer(polyline);
+    }
+}
+
+// 画点
+function addPathPoint(latlngs)
+{
+	var len = latlngs.length ,i,angle = 0;
+    if(len == 0 )return;
+    for(i=0;i<len;i++){
+		// 过滤
+//		if(i%3 !=0 )continue;
+        if(i<len-1)angle = Math.atan2(latlngs[i+1][1]-latlngs[i][1],latlngs[i+1][0]-latlngs[i][0])*180/Math.PI;
+        if(angle <0)angle += 360.0;
+        var tmp_angle = angle.toFixed(2);
+		var marker = L.marker([latlngs[i][0],latlngs[i][1]],{icon:g_arrow2_icon,rotationAngle:angle,rotationOrigin:'center',});
+		marker.bindPopup("{\"lng\":"+latlngs[i][1]*1e7+",\"lat\":"+latlngs[i][0]*1e7+"}</br>angle:"+tmp_angle);
+		g_arg.group.addLayer(marker);
+    }
+}
+
+// 采点保存的json解析
+function parsePath(filename){
+	$.getJSON(filename,function(data){
+		var points = data.points;
+		var len = points.length , k;
+		var latlngs = [];
+		for(k=0;k<len;k++){
+			var p = points[k];
+            if(p.length < 2)continue;
+            var lng = p[0];
+            var lat = p[1];
+            latlngs.push([lat,lng]);
+		}
+        addPathPoint(latlngs);
+        addPathLine(latlngs,g_color[g_color_index++%g_color.length]);
+    }).error(function() {alert("解析文件失败 : "+filename);});
+}
+
+
 
 

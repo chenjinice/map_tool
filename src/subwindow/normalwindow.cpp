@@ -105,6 +105,7 @@ void NormalWindow::addButtons()
     QPushButton *add_at_bt   = new QPushButton("加点");
     QPushButton *map_bt      = new QPushButton("国标地图json");
     QPushButton *path_bt     = new QPushButton("采点路径json");
+    QPushButton *clear_bt    = new QPushButton("清空");
 
     m_grid->addWidget(save_l,m_index,0);
     m_grid->addWidget(m_line_edit,m_index++,1);
@@ -112,12 +113,14 @@ void NormalWindow::addButtons()
     m_grid->addWidget(add_at_bt,m_index++,0,1,2);
     m_grid->addWidget(map_bt,m_index++,0,1,2);
     m_grid->addWidget(path_bt,m_index++,0,1,2);
+    m_grid->addWidget(clear_bt,m_index++,0,1,2);
 
     connect(m_line_edit,&QLineEdit::returnPressed,this,&NormalWindow::saveClicked);
     connect(add_bt,&QPushButton::clicked,this,&NormalWindow::addClicked);
     connect(add_at_bt,&QPushButton::clicked,this,&NormalWindow::addAtClicked);
     connect(map_bt,&QPushButton::clicked,this,&NormalWindow::openMapClicked);
     connect(path_bt,&QPushButton::clicked,this,&NormalWindow::openPathClicked);
+    connect(clear_bt,&QPushButton::clicked,this,&NormalWindow::clearClicked);
 }
 
 void NormalWindow::getIpList()
@@ -301,5 +304,10 @@ void NormalWindow::openPathClicked()
     for(int i=0; i<l.length();i++){
         emit m_webview->obj()->openPathJson(l[i]);
     }
+}
+
+void NormalWindow::clearClicked()
+{
+    emit m_webview->obj()->clearAll();
 }
 

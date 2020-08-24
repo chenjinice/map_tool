@@ -32,6 +32,7 @@ private:
     void            addAtClicked();
     void            openMapClicked();
     void            openPathClicked();
+    void            clearClicked();
 
     int              m_index        = 0;
     QWidget *        m_car_widget   = nullptr;

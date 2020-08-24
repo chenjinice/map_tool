@@ -36,10 +36,15 @@
                         // 从通道中获取交互对象
                         g_arg.obj = channel.objects.webobject;
                         mapInit();
+                        updateCar(112.8657822,28.1114320,0);
+                        updateCar(112.8657822,28.1114320,90);
+                        addMarker(112.8657822,28.1114320);
+                        
                         g_arg.obj.mapUpdate.connect(function(){
                             mapInit();
                         });
-                        g_arg.obj.carUpdate.connect(function(file){
+                        g_arg.obj.carUpdate.connect(function(lng,lat,heading){
+                            updateCar(lng,lat,heading);
                         });
                         g_arg.obj.addMarker.connect(function(){
                             addMarkerAtCenter();
@@ -51,8 +56,11 @@
                             mapParse(file);
                         });
                         g_arg.obj.openPathJson.connect(function(file){
+                            parsePath(file);
                         });
-                        addMarker(112.9040909,28.1339123);
+                        g_arg.obj.clearAll.connect(function(){
+                            clearAll();
+                        });
                     })
                 }else{
                     mapInit();

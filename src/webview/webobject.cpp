@@ -16,6 +16,7 @@
 using namespace std;
 
 
+#define MAX_ZOOM            22
 #define M_PI                3.14159265358979323846
 #define SATELLITE_MAP_DIR   "s/"
 #define STREET_MAP_DIR      "m/"
@@ -85,6 +86,7 @@ void WebObject::threadFun()
         m_mutex.unlock();
         QThread::usleep(20*1000);
     }
+    manager->clearAccessCache();
     timer->stop();
     delete timer;
     delete request;
@@ -273,6 +275,7 @@ void WebObject::sendUpdateSignal()
 void WebObject::getBounds(double lat1, double lat2, double lng1, double lng2, int zoom, int type)
 {
 //    qDebug() << lat1 << "," << lat2 << "," << lng1 << "," << lng2 << "," << zoom << "---------";
+    if(zoom > MAX_ZOOM)return;
     Range x_range,y_range;
     getX(lng1,lng2,zoom,x_range);
     getY(lat1,lat2,zoom,y_range);
