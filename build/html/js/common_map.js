@@ -95,10 +95,19 @@ function addMarker(lng,lat){
 function updateCar(lng,lat,heading){
     if(g_car == null){
         g_car = L.marker([lat,lng],{icon:g_car_icon,rotationAngle:heading}).addTo(g_arg.map);
+        g_car.bindPopup("lng : "+lng+"</br>lat : "+lat+"</br>heading : "+heading);
     }else{
         g_car.setLatLng([lat,lng]);
         g_car.setRotationAngle(heading);
+        g_car.setPopupContent("lng : "+lng+"</br>lat : "+lat+"</br>heading : "+heading);
     }
+}
+
+// 添加车的位置
+function addCar(lng,lat,heading){
+    var marker = L.marker([lat,lng],{icon:g_car_icon,rotationAngle:heading}).addTo(g_arg.map);
+    marker.bindPopup("lng : "+lng+"</br>lat : "+lat+"</br>heading : "+heading);
+    saveLayer(marker);
 }
 
 // layout 存到全局变量

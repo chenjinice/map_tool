@@ -36,9 +36,6 @@
                         // 从通道中获取交互对象
                         g_arg.obj = channel.objects.webobject;
                         mapInit();
-                        updateCar(112.8657822,28.1114320,0);
-                        updateCar(112.8657822,28.1114320,90);
-                        addMarker(112.8657822,28.1114320);
                         
                         g_arg.obj.mapUpdate.connect(function(){
                             mapInit();
@@ -64,8 +61,12 @@
                     })
                 }else{
                     mapInit();
-                    addMarker(112.8520119,28.1195181);
                     addMarker(112.8657822,28.1114320);
+                    
+                    addMarker(106.8283559,29.7133728);
+                    addCar(106.8283651,29.7133861,98.4700001);   
+                    addCar(106.8332356 ,29.7122583 ,274.730011); // 63,-80
+                    addCar(106.8331764 ,29.7122701 ,286.320007); // -30,81
                 }
             })
         </script>
