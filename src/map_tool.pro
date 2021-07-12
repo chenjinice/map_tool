@@ -46,13 +46,14 @@ INCLUDEPATH += webview/
 INCLUDEPATH += subwindow/
 INCLUDEPATH += common/
 INCLUDEPATH += logwidget/
+INCLUDEPATH += libs/zmq/
+INCLUDEPATH += libs/protobuf/
+
 
 LIBS += -lws2_32
-
-# Default rules for deployment.
-qnx: target.path = /tmp/$${TARGET}/bin
-else: unix:!android: target.path = /opt/$${TARGET}/bin
-!isEmpty(target.path): INSTALLS += target
+LIBS += -L$$PWD/libs/zmq -llibzmq
+LIBS += -L$$PWD/libs/protobuf -llibprotobuf
 
 RESOURCES += \
     img.qrc
+

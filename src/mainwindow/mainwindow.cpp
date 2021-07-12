@@ -60,7 +60,7 @@ void MainWindow::setMenu()
 void MainWindow::newNormalTrigged()
 {
     NormalWindow * w = new NormalWindow;
-    w->setWindowTitle("谷歌地图");
+    w->setWindowTitle("地图");
     m_mdi->addSubWindow(w);
     w->show();
 }
