@@ -18,12 +18,15 @@ private:
     ~LogDock();
     void init();
 
-    static LogDock *m_instance;
-    int        m_size;
-    QTextEdit *m_edit;
+    static LogDock *    m_instance;
+    int                 m_size;
+    QTextEdit *         m_edit;
 
 public slots:
     void log(QString str);
+
+signals:
+    void showLog(QString str);
 };
 
 #endif // LOGDOCK_H

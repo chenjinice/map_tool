@@ -19,7 +19,7 @@ LogDock::~LogDock()
 LogDock *LogDock::ins()
 {
     if(m_instance == nullptr){
-        m_instance = new LogDock;
+        m_instance = new LogDock();
     }
     return m_instance;
 }

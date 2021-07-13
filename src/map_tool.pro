@@ -22,8 +22,9 @@ SOURCES += \
     logwidget/logdock.cpp \
     main.cpp \
     mainwindow/mainwindow.cpp \
-    subwindow/ldmwindow.cpp \
     subwindow/normalwindow.cpp \
+    subwindow/obuwindow.cpp \
+    subwindow/subwindow.cpp \
     subwindow/udpthread.cpp \
     webview/webobject.cpp \
     webview/webview.cpp
@@ -34,8 +35,9 @@ HEADERS += \
     common/setting.h \
     logwidget/logdock.h \
     mainwindow/mainwindow.h \
-    subwindow/ldmwindow.h \
     subwindow/normalwindow.h \
+    subwindow/obuwindow.h \
+    subwindow/subwindow.h \
     subwindow/udpthread.h \
     webview/webobject.h \
     webview/webview.h
