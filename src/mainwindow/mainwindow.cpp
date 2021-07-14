@@ -8,7 +8,7 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     m_mdi = new QMdiArea;
-    m_mdi->setViewMode(QMdiArea::TabbedView);
+    m_mdi->setViewMode(QMdiArea::SubWindowView);
 
     LogDock *log_dock = LogDock::ins();
     this->addDockWidget(Qt::BottomDockWidgetArea,log_dock);

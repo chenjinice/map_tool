@@ -52,11 +52,12 @@ void LogDock::init()
 void LogDock::log(QString str)
 {
     if(!this->isVisible())return;
-    QString text = m_edit->toPlainText();
+    const QString &text = m_edit->toPlainText();
     int len = text.count();
     if(len > m_size){
-        text.remove(0,len/2);
-        m_edit->setText(text);
+        QString new_text = text;
+        new_text.remove(0,len/2);
+        m_edit->setText(new_text);
     }
     m_edit->append(str);
 }

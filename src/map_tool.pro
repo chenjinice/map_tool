@@ -18,6 +18,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
+    common/my_zmq.cpp \
     common/setting.cpp \
     logwidget/logdock.cpp \
     main.cpp \
@@ -32,6 +33,7 @@ SOURCES += \
 
 HEADERS += \
     common/common_defines.h \
+    common/my_zmq.h \
     common/setting.h \
     logwidget/logdock.h \
     mainwindow/mainwindow.h \
