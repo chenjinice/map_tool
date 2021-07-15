@@ -18,7 +18,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
-    common/my_zmq.cpp \
     common/setting.cpp \
     logwidget/logdock.cpp \
     main.cpp \
@@ -33,7 +32,6 @@ SOURCES += \
 
 HEADERS += \
     common/common_defines.h \
-    common/my_zmq.h \
     common/setting.h \
     logwidget/logdock.h \
     mainwindow/mainwindow.h \
@@ -48,6 +46,9 @@ HEADERS += \
 INCLUDEPATH += mainwindow/
 INCLUDEPATH += webview/
 INCLUDEPATH += subwindow/
+    img.qrc
+
+
 INCLUDEPATH += common/
 INCLUDEPATH += logwidget/
 INCLUDEPATH += libs/zmq/
@@ -55,9 +56,5 @@ INCLUDEPATH += libs/protobuf/
 
 
 LIBS += -lws2_32
-LIBS += -L$$PWD/libs/zmq -llibzmq
-LIBS += -L$$PWD/libs/protobuf -llibprotobuf
 
 RESOURCES += \
-    img.qrc
-

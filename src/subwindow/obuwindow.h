@@ -5,7 +5,6 @@
 #include <QLabel>
 #include <QLineEdit>
 #include "subwindow.h"
-#include "my_zmq.h"
 
 
 class ObuWindow : public SubWindow
@@ -19,6 +18,7 @@ private:
     QWidget *       addStateWidget();
 
     void            zmqDataReceived(uint8_t *buffer,int len);
+    void            receive();
 
     QLabel *        m_pos       = nullptr;
     QLabel *        m_heading   = nullptr;
@@ -28,7 +28,6 @@ private:
     QLabel *        m_model     = nullptr;
     QLineEdit *     m_ip        = nullptr;
 
-    MyZmq  *        m_zmq       = nullptr;
 
 };
 

@@ -2,12 +2,13 @@
 #include <QGridLayout>
 #include <QDebug>
 #include <QSplitter>
+#include <QUdpSocket>
 #include "obuwindow.h"
 #include "webview.h"
 #include "common_defines.h"
 #include "logdock.h"
 
-
+QUdpSocket * uSocket;
 ObuWindow::ObuWindow(QWidget *parent) : SubWindow(parent)
 {
     QSplitter *spliter      = new QSplitter(Qt::Vertical);
@@ -17,21 +18,15 @@ ObuWindow::ObuWindow(QWidget *parent) : SubWindow(parent)
     spliter->addWidget(state_widget);
     this->layout()->addWidget(spliter);
 
-    ZmqCallBack fun         = ZmqBindClassFun(&ObuWindow::zmqDataReceived,this);
-    m_zmq                   = new MyZmq();
-
-    connect(m_zmq,&MyZmq::log,LogDock::ins(),&LogDock::log);
-
-
-    m_zmq->startSubscriber("tcp://10.9.43.99:3411","location",fun);
+    uSocket = new QUdpSocket;
+    uSocket->bind(QHostAddress("127.0.0.1"), 8888);
+    connect(uSocket,&QUdpSocket::readyRead, this, &ObuWindow::receive);
 
 }
 
 
 ObuWindow::~ObuWindow()
 {
-    m_zmq->stop();
-    delete m_zmq;
 }
 
 QWidget *ObuWindow::addStateWidget()
@@ -81,4 +76,15 @@ QWidget *ObuWindow::addStateWidget()
 void ObuWindow::zmqDataReceived(uint8_t *buffer, int len)
 {
     qDebug() << len ;
+}
+
+void ObuWindow::receive()
+{
+    qDebug() << "received --------------" ;
+    QByteArray ba;
+    while(uSocket->hasPendingDatagrams())
+    {
+        ba.resize(uSocket->pendingDatagramSize());
+        uSocket->readDatagram(ba.data(), ba.size());
+    }
 }
