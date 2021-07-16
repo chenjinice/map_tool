@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     this->setMenu();
     this->setToolBar();
     this->setCentralWidget(m_mdi);
-    this->newNormalTrigged();
+//    this->newNormalTrigged();
 }
 
 void MainWindow::setMenu()

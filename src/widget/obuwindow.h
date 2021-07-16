@@ -5,6 +5,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include "subwindow.h"
+#include "obuudp.h"
 
 
 class ObuWindow : public SubWindow

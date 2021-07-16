@@ -28,6 +28,15 @@ SOURCES += \
     webview/webview.cpp \
     device/obuudp.cpp
 
+HEADERS += \
+    device/obuudp.h \
+    widget/logdock.h \
+    widget/mainwindow.h \
+    widget/obuwindow.h \
+    widget/subwindow.h \
+    webview/webobject.h \
+    webview/webview.h
+
 
 INCLUDEPATH += widget/
 INCLUDEPATH += device/
@@ -43,6 +52,4 @@ INCLUDEPATH += libs/protobuf/
 
 RESOURCES +=
 
-HEADERS += \
-    device/obuudp.h
 
