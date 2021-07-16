@@ -2,7 +2,7 @@
 #define COMMON_DEFINES_H
 
 
-#define HTML_INDEX  "c:/Users/63220/Desktop/web/index.html"
+#define HTML_INDEX  "/home/chen/Desktop/map_tool/bin/html/index.html"
 
 
 

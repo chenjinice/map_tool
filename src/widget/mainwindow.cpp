@@ -2,7 +2,6 @@
 #include "webview.h"
 #include "logdock.h"
 #include "obuwindow.h"
-#include "normalwindow.h"
 
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
@@ -14,15 +13,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     this->addDockWidget(Qt::BottomDockWidgetArea,log_dock);
     log_dock->close();
 
-    QStatusBar *status_bar = new QStatusBar();
 
-//    this->setStatusBar(status_bar);
     this->setMenu();
     this->setToolBar();
     this->setCentralWidget(m_mdi);
     this->newNormalTrigged();
-
-
 }
 
 void MainWindow::setMenu()

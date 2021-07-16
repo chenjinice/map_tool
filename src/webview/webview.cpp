@@ -18,7 +18,7 @@ WebView::WebView(QString path, QWidget *parent) : QWidget(parent)
     web_channel->registerObject("webobject",m_obj);
 
     m_web->page()->setWebChannel(web_channel);
-    m_web->load(QUrl(m_path));
+    m_web->load(QUrl("file://"+m_path));
     layout->addWidget(m_web);
     layout->setMargin(0);
     this->setLayout(layout);

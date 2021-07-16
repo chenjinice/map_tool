@@ -96,7 +96,7 @@ void WebObject::threadFun()
 void WebObject::connectGoogleThread()
 {
     QProcess process;
-    process.start("ping -n 2 www.google.com");
+    process.start("ping -c 2 www.google.com");
     process.waitForStarted();
     if( !process.waitForFinished(2000) ){
         process.kill();
@@ -104,7 +104,7 @@ void WebObject::connectGoogleThread()
     }
     QString str = process.readAll();
     QString log;
-    if(str.indexOf("TTL") == -1){
+    if(str.indexOf("ttl") == -1){
         log = "connect to google failed !!";
         m_google = false;
     }else{
