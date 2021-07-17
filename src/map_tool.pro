@@ -1,5 +1,5 @@
 
-QT       += core gui webenginewidgets webchannel network
+QT       += core gui webenginewidgets webchannel
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -26,10 +26,10 @@ SOURCES += \
     widget/subwindow.cpp \
     webview/webobject.cpp \
     webview/webview.cpp \
-    device/obuudp.cpp
+    obu/obuudp.cpp
 
 HEADERS += \
-    device/obuudp.h \
+    obu/obuudp.h \
     widget/logdock.h \
     widget/mainwindow.h \
     widget/obuwindow.h \
@@ -39,16 +39,16 @@ HEADERS += \
 
 
 INCLUDEPATH += widget/
-INCLUDEPATH += device/
+INCLUDEPATH += obu/
 INCLUDEPATH += webview/
 INCLUDEPATH += subwindow/
 
 
 INCLUDEPATH += common/
 INCLUDEPATH += logwidget/
-INCLUDEPATH += libs/zmq/
-INCLUDEPATH += libs/protobuf/
 
+
+LIBS += -lpthread
 
 RESOURCES +=
 

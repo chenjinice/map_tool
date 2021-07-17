@@ -23,7 +23,7 @@ public slots:
     void            openPathClicked();
     void            clearClicked();
 
-private:
+protected:
     WebView *       m_webview      = nullptr;
 
 };

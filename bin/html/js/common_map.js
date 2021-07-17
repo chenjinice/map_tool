@@ -101,6 +101,7 @@ function updateCar(lng,lat,heading){
         g_car.setRotationAngle(heading);
         g_car.setPopupContent("lng : "+lng+"</br>lat : "+lat+"</br>heading : "+heading);
     }
+    g_arg.map.panTo([lat,lng],{"animate":true,"duration":0.5});
 }
 
 // 添加车的位置

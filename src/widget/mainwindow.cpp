@@ -2,6 +2,11 @@
 #include "webview.h"
 #include "logdock.h"
 #include "obuwindow.h"
+#include <QDialog>
+#include <QGridLayout>
+#include <QPushButton>
+#include <QApplication>
+#include <QDesktopWidget>
 
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
@@ -62,8 +67,31 @@ void MainWindow::setToolBar()
 
 void MainWindow::newNormalTrigged()
 {
-    ObuWindow *w = new ObuWindow();
-    w->setWindowTitle("地图");
+    static QDialog *   dialog       = nullptr;
+    static QLineEdit *ip_edit       = new QLineEdit;
+    static QDesktopWidget *deskdop  = QApplication::desktop();
+
+    if(dialog == nullptr){
+        dialog = new QDialog;
+        QGridLayout *layout = new QGridLayout;
+        QLabel *ip_label = new QLabel("ip:");
+        QPushButton *ok_button = new QPushButton("确定");
+        QPushButton *cancel_button = new QPushButton("取消");
+        layout->addWidget(ip_label,2,0,1,1);
+        layout->addWidget(ip_edit,2,1,1,1);
+        layout->addWidget(ok_button,3,0,1,1);
+        layout->addWidget(cancel_button,3,1,1,1);
+        dialog->setLayout(layout);
+        dialog->setWindowTitle("obu ip");
+        dialog->move((deskdop->width()-dialog->width())/2,(deskdop->height()-dialog->height())/2);
+
+        connect(ok_button,&QPushButton::clicked,dialog,&QDialog::accept);
+        connect(cancel_button,&QPushButton::clicked,dialog,&QDialog::reject);
+    }
+    if(dialog->exec() == QDialog::Rejected)return;
+
+    QString ip = ip_edit->text();
+    ObuWindow *w = new ObuWindow(ip);
     m_mdi->addSubWindow(w);
     w->show();
 
@@ -84,9 +112,9 @@ void MainWindow::logActionTrigged()
 
 MainWindow::~MainWindow()
 {
-    qDebug() << "~~~~~~~~~~~~~mainwindow";
-    m_mdi->closeAllSubWindows();
-    delete m_mdi;
+//    qDebug() << "~~~~~~~~~~~~~mainwindow";
+//    m_mdi->closeAllSubWindows();
+//    delete m_mdi;
 }
 
 
