@@ -172,6 +172,7 @@ bool mapToLocal(const MapData &map, LocalMap &l, const timeval &tv)
     for(int i = 0; i < count; i++){
         Node_t *node = map.nodes.list.array[i];
         LocalNode l_node;
+        posToLocal(node->refPos,l_node.pos);
         nodeToLocal(node,l_node);
         l.nodes.push_back(l_node);
     }

@@ -55,6 +55,9 @@
                         g_arg.obj.openPathJson.connect(function(file){
                             parsePath(file);
                         });
+						g_arg.obj.addAsnJson.connect(function(json){
+							parseAsnJson(json);
+                        });
                         g_arg.obj.clearAll.connect(function(){
                             clearAll();
                         });

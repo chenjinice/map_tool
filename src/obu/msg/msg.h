@@ -9,6 +9,9 @@
 #include <iostream>
 #include <list>
 #include <vector>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonDocument>
 
 #include "local/local.h"
 #include "convert.h"
@@ -23,7 +26,7 @@ void    rsmFunc(const LocalRsm &rsm);
 void    spatFunc(const LocalSpat &spat);
 
 // 数据编解码
-void    msgDecode(uint8_t *buffer, int len,const timeval &tv);
+void msgDecode(uint8_t *buffer, int len, QString ip, const timeval &tv, QJsonObject &json ,bool flag = false);
 
 
 #endif

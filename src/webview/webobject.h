@@ -72,6 +72,7 @@ signals:
     void                    addMarkerAt(double lng,double lat);
     void                    openMapJson(QString file);
     void                    openPathJson(QString file);
+    void                    addAsnJson(const QJsonObject &json);
     void                    clearAll();
 
 public slots:

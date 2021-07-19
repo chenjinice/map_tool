@@ -21,8 +21,6 @@ var g_arg = {
     group   : null
 }
 
-var g_lng;
-var g_lat;
 var g_car   = null;
 
 var g_arrow_icon  = L.icon({ iconUrl:'style/image/arrow.png',iconSize: [15, 15]});
@@ -95,11 +93,11 @@ function addMarker(lng,lat){
 function updateCar(lng,lat,heading){
     if(g_car == null){
         g_car = L.marker([lat,lng],{icon:g_car_icon,rotationAngle:heading}).addTo(g_arg.map);
-        g_car.bindPopup("lng : "+lng+"</br>lat : "+lat+"</br>heading : "+heading);
+        g_car.bindPopup("lng : "+lng.toFixed(7)+"</br>lat : "+lat.toFixed(7)+"</br>heading : "+heading.toFixed(2));
     }else{
         g_car.setLatLng([lat,lng]);
         g_car.setRotationAngle(heading);
-        g_car.setPopupContent("lng : "+lng+"</br>lat : "+lat+"</br>heading : "+heading);
+//        g_car.setPopupContent("lng : "+lng.toFixed(7)+"</br>lat : "+lat.toFixed(7)+"</br>heading : "+heading.toFixed(2));
     }
     g_arg.map.panTo([lat,lng],{"animate":true,"duration":0.5});
 }
@@ -107,7 +105,7 @@ function updateCar(lng,lat,heading){
 // 添加车的位置
 function addCar(lng,lat,heading){
     var marker = L.marker([lat,lng],{icon:g_car_icon,rotationAngle:heading}).addTo(g_arg.map);
-    marker.bindPopup("lng : "+lng+"</br>lat : "+lat+"</br>heading : "+heading);
+    marker.bindPopup("lng : "+lng.toFixed(7)+"</br>lat : "+lat.toFixed(7)+"</br>heading : "+heading.toFixed(2));
     saveLayer(marker);
 }
 
@@ -148,12 +146,10 @@ function addLaneLine(latlngs,id,line_color){
 function addNodePoint(latlng,angle)
 {
     var marker = L.marker([latlng[0],latlng[1]],{icon:g_arrow_icon,rotationAngle:angle,rotationOrigin:'center',}).addTo(g_arg.map);
-    var lat_offset = latlng[0]*1e7 - g_lat;
-    var lng_offset = latlng[1]*1e7 - g_lng;
     var tmp_angle = angle;
     if(tmp_angle <0)tmp_angle += 360.0;
     tmp_angle = tmp_angle.toFixed(2);
-    marker.bindPopup("lng : "+latlng[1]+"</br>lat : "+latlng[0] +"</br>lng_offset : "+lng_offset+"</br>lat_offset : "+lat_offset +"</br>angle :"+tmp_angle);
+    marker.bindPopup("lng : "+latlng[1]+"</br>lat : "+latlng[0] + "</br>angle :"+tmp_angle);
     saveLayer(marker);
 }
 
@@ -190,10 +186,8 @@ function addMapJson(data)
     var nodes = data.nodes;
     for(var i in nodes){
         var node = nodes[i];
-        g_lng = node.refPos.lng;
-        g_lat = node.refPos.lat;
-        var lng = (g_lng*1e-7).toFixed(7);
-        var lat = (g_lat*1e-7).toFixed(7);
+        var lng = node.refPos.lng.toFixed(7);
+        var lat = node.refPos.lat.toFixed(7);
         var node_id = node.id.id;
         var node_region = node.id.region;
         if("undefined" == typeof node_region)node_region="--";
@@ -208,10 +202,8 @@ function addMapJson(data)
 // rsi
 function addRsiJson(data)
 {
-    g_lng = data.refPos.lng;
-    g_lat = data.refPos.lat;
-    var lng = (g_lng*1e-7).toFixed(7);
-    var lat = (g_lat*1e-7).toFixed(7);
+    var lng = data.refPos.lng.toFixed(7);
+    var lat = data.refPos.lat.toFixed(7);
     var center = [lat,lng];
     g_arg.map.panTo(center,{animate:true,duration:0.5});
     addCenterPoint(lat,lng,"--","--");
@@ -286,5 +278,42 @@ function parsePath(filename){
 }
 
 
+// ------------------------------- asn json -------------------------
+
+function parseAsnMapLanes(lanes){
+	for(var j in lanes){
+        var points = lanes[j].points;
+        var latlngs = [],latlngs_offset = [];
+        for(var k in points){
+            var p = points[k];
+            var plng = p.lng.toFixed(7);
+            var plat = p.lat.toFixed(7);
+            latlngs.push([plat,plng]);
+        }
+        addLaneLine(latlngs,lanes[j].lane_id,"#FF0000");
+    }
+}
+
+
+function parseAsnMap(nodes){
+	for(i=0;i<nodes.length;i++){
+		var node = nodes[i];
+        var lng = node.lng.toFixed(7);
+        var lat = node.lat.toFixed(7);
+        var node_id = node.id;
+        var node_region = node.region;
+        var center = [lat,lng];
+        addCenterPoint(lat,lng,node_id,node_region);
+        g_arg.map.panTo(center,{animate:true,duration:0.5});
+        parseAsnMapLanes(node.lanes);
+	}
+}
+
+
+function parseAsnJson(json){
+	if(json.type == "map_asn"){
+		parseAsnMap(json.nodes);
+	}
+}
 
 

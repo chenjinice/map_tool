@@ -18,7 +18,7 @@ public:
 private:
     QWidget *       addStateWidget();
 
-    void            gpsReceived(UiGpsData data);
+    void            gpsReceived(const UiGpsData &data);
 
     QLineEdit *     m_pos       = nullptr;
     QLineEdit *     m_heading   = nullptr;

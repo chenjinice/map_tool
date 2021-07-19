@@ -106,8 +106,8 @@ void MapCache::getCurrentLane()
     m_mutex.unlock();
     me->map_info = info;
 
-//    myDebug("node_id=%d,region=%d,link_id=%d,lane_id=%d,dist_to_line=%.02lf,speed=(%.02lf~%.02lf)\n",
-//            info.node_id.id,info.node_id.region,info.link_id,info.lane_id,info.dist_to_line, info.speed.min, info.speed.max);
+    qDebug("node_id=%d,region=%d,link_id=%d,lane_id=%d,dist_to_line=%.02lf\n",
+            info.node_id.id,info.node_id.region,info.link_id,info.lane_id,info.dist_to_line);
 }
 
 // 遍历node的lanes，返回本车与node的所有点的最短距离

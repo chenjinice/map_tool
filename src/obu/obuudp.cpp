@@ -15,6 +15,7 @@
 #include <sstream>
 #include <thread>
 #include <QDebug>
+#include <QJsonObject>
 
 #include "msg.h"
 
@@ -114,6 +115,11 @@ void ObuUdp::asnParse(uint8_t *buffer, int len)
 {
     qDebug() << "asn -------" << len;
     // 写入文件
+    timeval tv;
+    QJsonObject json;
+
+    gettimeofday(&tv,nullptr);
+    msgDecode(buffer,len,m_ip,tv,json,true);
 
 //    timeval tv;
 //    gettimeofday(&tv,nullptr);
@@ -121,5 +127,8 @@ void ObuUdp::asnParse(uint8_t *buffer, int len)
 //    ofstream outFile(path, ios::out | ios::binary);
 //    outFile.write((char*)buffer,len);
 //    outFile.close();
+    if(!json.isEmpty()){
+        emit toWeb(json);
+    }
 }
 

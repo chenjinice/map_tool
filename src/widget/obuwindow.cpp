@@ -25,6 +25,7 @@ ObuWindow::ObuWindow(QString ip, QWidget *parent) : SubWindow(parent)
         this->setWindowTitle(ip+" : "+err);
     }
     connect(m_obu,&ObuUdp::toUi,this,&ObuWindow::gpsReceived);
+    connect(m_obu,&ObuUdp::toWeb,this->m_webview->obj(),&WebObject::addAsnJson);
 }
 
 
@@ -73,7 +74,7 @@ QWidget *ObuWindow::addStateWidget()
     return w;
 }
 
-void ObuWindow::gpsReceived(UiGpsData data)
+void ObuWindow::gpsReceived(const UiGpsData &data)
 {
     double  d_lng     = data.lng * kObuPosRes;
     double  d_lat     = data.lat * kObuPosRes;

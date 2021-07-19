@@ -48,10 +48,10 @@ private:
     int     m_fd            = -1;
     QString m_ip;
 
-
 signals:
     void log(QString str);
-    void toUi(UiGpsData data);
+    void toUi(const UiGpsData   &data);
+    void toWeb(const QJsonObject &json);
 };
 
 #endif // OBUUDP_H

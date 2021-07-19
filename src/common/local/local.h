@@ -208,6 +208,7 @@ class LocalNode
 {
 public:
     LocalNodeId          id;                                      // node id
+    PosWGS84             pos;                                     //
     vector<LocalLane>    lanes;                                   // 车道
 };
 

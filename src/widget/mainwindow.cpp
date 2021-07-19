@@ -68,7 +68,7 @@ void MainWindow::setToolBar()
 void MainWindow::newNormalTrigged()
 {
     static QDialog *   dialog       = nullptr;
-    static QLineEdit *ip_edit       = new QLineEdit;
+    static QLineEdit *ip_edit       = new QLineEdit("127.0.0.1");
     static QDesktopWidget *deskdop  = QApplication::desktop();
 
     if(dialog == nullptr){
