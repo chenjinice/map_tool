@@ -12,6 +12,7 @@ class SubWindow : public QWidget
     Q_OBJECT
 public:
     SubWindow(QWidget *parent = nullptr);
+    ~SubWindow();
 
 signals:
     void log(QString str);

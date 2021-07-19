@@ -16,6 +16,9 @@
 #include <thread>
 #include <QDebug>
 
+#include "msg.h"
+
+
 using namespace std;
 
 static const int kPort = 30000;
@@ -112,12 +115,11 @@ void ObuUdp::asnParse(uint8_t *buffer, int len)
     qDebug() << "asn -------" << len;
     // 写入文件
 
-    timeval tv;
-    gettimeofday(&tv,nullptr);
-    string path = to_string(tv.tv_sec) + "_" + to_string(tv.tv_usec) + ".log";
-    ofstream outFile(path, ios::out | ios::binary);
-    outFile.write((char*)buffer,len);
-    outFile.close();
-
+//    timeval tv;
+//    gettimeofday(&tv,nullptr);
+//    string path = to_string(tv.tv_sec) + "_" + to_string(tv.tv_usec) + ".log";
+//    ofstream outFile(path, ios::out | ios::binary);
+//    outFile.write((char*)buffer,len);
+//    outFile.close();
 }
 

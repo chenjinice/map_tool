@@ -18,6 +18,11 @@ SubWindow::SubWindow(QWidget *parent) : QWidget(parent)
     this->setLayout(layout);
 }
 
+SubWindow::~SubWindow()
+{
+    delete m_webview;
+}
+
 void SubWindow::addClicked()
 {
     emit m_webview->obj()->addMarker();
